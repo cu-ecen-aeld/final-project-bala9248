@@ -33,7 +33,7 @@ MODULE_I2C="ENABLE_I2C = \"1\""
 AUTOLOAD_I2C="KERNEL_MODULE_AUTOLOAD:rpi += \"i2c-dev i2c-bcm2708\""
 
 #Extra packages
-CORE_IM_ADD="CORE_IMAGE_EXTRA_INSTALL += \"i2c-config wlan0-config\""
+CORE_IM_ADD="CORE_IMAGE_EXTRA_INSTALL += \"i2c-config wlan0-config server-config client-config\""
 
 cat conf/local.conf | grep "${CONFLINE}" > /dev/null
 local_conf_info=$?
@@ -154,6 +154,12 @@ layer_i2c_info=$?
 bitbake-layers show-layers | grep "meta-wlan0" > /dev/null
 layer_wlan0_info=$?
 
+bitbake-layers show-layers | grep "meta-server" > /dev/null
+layer_server_info=$?
+
+bitbake-layers show-layers | grep "meta-client" > /dev/null
+layer_client_info=$?
+
 if [ $layer_metaoe_info -ne 0 ];then
     echo "Adding meta-oe layer"
 	bitbake-layers add-layer ../meta-openembedded/meta-oe
@@ -198,6 +204,20 @@ if [ $layer_wlan0_info -ne 0 ];then
         bitbake-layers add-layer ../meta-wlan0
 else
         echo "meta-wlan0 layer already exists"
+fi
+
+if [ $layer_server_info -ne 0 ];then
+        echo "Adding meta-server layer"
+        bitbake-layers add-layer ../meta-server
+else
+        echo "meta-server layer already exists"
+fi
+
+if [ $layer_client_info -ne 0 ];then
+        echo "Adding meta-client layer"
+        bitbake-layers add-layer ../meta-client
+else
+        echo "meta-client layer already exists"
 fi
 
 set -e
