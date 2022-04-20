@@ -45,4 +45,6 @@ do_install () {
 	install -m 0755 ${B}/server ${D}${bindir}/
 	
 	install -m 0755 ${B}/sensor ${D}${bindir}/
+	
+	
 }

@@ -20,12 +20,12 @@ MEMORY="GPU_MEM = \"16\""
 #Add wifi support
 DISTRO_F="DISTRO_FEATURES:append = \"wifi\""
 #add firmware support 
-IMAGE_ADD="IMAGE_INSTALL:append = \"linux-firmware-rpidistro-bcm43430 v4l-utils python3 ntp wpa-supplicant i2c-tools\""
+IMAGE_ADD="IMAGE_INSTALL:append = \"linux-firmware-rpidistro-bcm43430 v4l-utils python3 ntp wpa-supplicant i2c-tools libgpiod libgpiod-tools libgpiod-dev\""
 
 #Licence
 LICENCE="LICENSE_FLAGS_ACCEPTED  = \"commercial\""
 
-IMAGE_F="IMAGE_FEATURES += \"ssh-server-openssh\""
+IMAGE_F="IMAGE_FEATURES += \"ssh-server-openssh tools-debug\""
 
 #I2C
 MODULE_I2C="ENABLE_I2C = \"1\""
@@ -33,7 +33,7 @@ MODULE_I2C="ENABLE_I2C = \"1\""
 AUTOLOAD_I2C="KERNEL_MODULE_AUTOLOAD:rpi += \"i2c-dev i2c-bcm2708\""
 
 #Extra packages
-CORE_IM_ADD="CORE_IMAGE_EXTRA_INSTALL += \"i2c-config wlan0-config server-config client-config\""
+CORE_IM_ADD="CORE_IMAGE_EXTRA_INSTALL += \"i2c-config wlan0-config server-config client-config gpio-config\""
 
 cat conf/local.conf | grep "${CONFLINE}" > /dev/null
 local_conf_info=$?
@@ -136,6 +136,7 @@ else
         echo "${CORE_IM_ADD} already exists in the local.conf file"
 fi
 
+
 bitbake-layers show-layers | grep "meta-raspberrypi" > /dev/null
 layer_info=$?
 
@@ -159,6 +160,9 @@ layer_server_info=$?
 
 bitbake-layers show-layers | grep "meta-client" > /dev/null
 layer_client_info=$?
+
+bitbake-layers show-layers | grep "meta-gpio" > /dev/null
+layer_gpio_info=$?
 
 if [ $layer_metaoe_info -ne 0 ];then
     echo "Adding meta-oe layer"
@@ -218,6 +222,13 @@ if [ $layer_client_info -ne 0 ];then
         bitbake-layers add-layer ../meta-client
 else
         echo "meta-client layer already exists"
+fi
+
+if [ $layer_gpio_info -ne 0 ];then
+        echo "Adding meta-gpio layer"
+        bitbake-layers add-layer ../meta-gpio
+else
+        echo "meta-gpio layer already exists"
 fi
 
 set -e
